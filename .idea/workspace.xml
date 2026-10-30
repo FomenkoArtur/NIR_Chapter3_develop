@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="31" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="NIR-Chapter3" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;FomenkoArtur&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/FomenkoArtur/HIR_Chapter3.git&quot;,
+    &quot;accountId&quot;: &quot;604d39b8-3d0d-4611-9e88-24fd3b0f036b&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.3786057736287378" />
+      <entry key="MS500" value="2.373794831698895" />
+      <entry key="S2" value="2.816708441974926" />
+      <entry key="S5" value="2.92421811393544" />
+      <entry key="S10" value="2.961684576925487" />
+      <entry key="S30" value="2.987133989809598" />
+      <entry key="S60" value="2.9992381300978956" />
+      <entry key="M2" value="3.3715545413486083" />
+      <entry key="M5" value="8.00267985478606" />
+      <entry key="M10" value="16.798888032513318" />
+      <entry key="M15" value="23.852852395169048" />
+      <entry key="M30" value="36.654324252087775" />
+      <entry key="H1" value="47.06381410371542" />
+      <entry key="H2" value="53.841180504925035" />
+      <entry key="H4" value="57.72897385203404" />
+      <entry key="D1" value="61.259755515565885" />
+      <entry key="W1" value="61.89353034416931" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.1285340618565535E-105" />
+      <entry key="S5" value="1.0495566113157477E-42" />
+      <entry key="S10" value="1.0244787022265265E-21" />
+      <entry key="S30" value="1.008093879773303E-7" />
+      <entry key="S60" value="3.1750494909168917E-4" />
+      <entry key="M2" value="0.01782139480299245" />
+      <entry key="M5" value="0.20563333889694793" />
+      <entry key="M10" value="0.5239752684745391" />
+      <entry key="M15" value="0.7656657479993446" />
+      <entry key="M30" value="1.1901625012477197" />
+      <entry key="H1" value="1.526780203975647" />
+      <entry key="H2" value="1.7427965730267918" />
+      <entry key="H4" value="1.8657259522378193" />
+      <entry key="D1" value="1.976784102764212" />
+      <entry key="W1" value="1.9966622746449951" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.3083322255940493" />
+      <entry key="MS500" value="2.2851043449217947" />
+      <entry key="S2" value="2.7828088936142534" />
+      <entry key="S5" value="2.9094339197290457" />
+      <entry key="S10" value="2.9540756155471066" />
+      <entry key="S30" value="2.9845482985100533" />
+      <entry key="S60" value="2.9981825024725572" />
+      <entry key="M2" value="3.386317843380827" />
+      <entry key="M5" value="8.196117406494265" />
+      <entry key="M10" value="17.30857275503992" />
+      <entry key="M15" value="24.605621315055398" />
+      <entry key="M30" value="37.83553861357721" />
+      <entry key="H1" value="48.58523409023425" />
+      <entry key="H2" value="55.58102441176623" />
+      <entry key="H4" value="59.593147075124214" />
+      <entry key="D1" value="63.23626940280052" />
+      <entry key="W1" value="63.89015372518583" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3JlLVx1EAKrqqEguBPfMCeAw6ir" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.diagnose.executor&quot;: &quot;Run&quot;,
+    &quot;Python.diagnose2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.episode.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_window.executor&quot;: &quot;Run&quot;,
+    &quot;Python.model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.plots.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_gui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.show_model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tune_pid.executor&quot;: &quot;Run&quot;,
+    &quot;Python.visualization.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;NIR-Chapter3&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/AF/PycharmProjects/NIR_Chapter3_develop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;python.packages.toolwindow.project.migrated.to.right.top.v2&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-ebb3072d7bdf-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.11879.98" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="" />
+      <created>1790230735528</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1790230735528</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Chapter3">
+      <option name="closed" value="true" />
+      <created>1790236021495</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1790236021495</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Chapter3">
+      <option name="closed" value="true" />
+      <created>1790238584868</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1790238584868</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Chapter3">
+      <option name="closed" value="true" />
+      <created>1790840807349</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1790840807349</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Chapter3">
+      <option name="closed" value="true" />
+      <created>1790840816098</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1790840816098</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1790859437818</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1790859437818</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1792340240709</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1792340240709</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1792345423898</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1792345423898</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1792583058530</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1792583058530</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1792672308868</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1792672308869</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Chapter3" />
+    <MESSAGE value="Voice" />
+    <option name="LAST_COMMIT_MESSAGE" value="Voice" />
+  </component>
+</project>
