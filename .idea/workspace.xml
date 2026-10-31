@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice">
-      <change afterPath="$PROJECT_DIR$/bench_train.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller_weights.pt" beforeDir="false" afterPath="$PROJECT_DIR$/controller_weights.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/workers.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/workers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hw.py" beforeDir="false" afterPath="$PROJECT_DIR$/hw.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/episode.py" beforeDir="false" afterPath="$PROJECT_DIR$/episode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fastsim.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastsim.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tune_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/tune_cnn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tuned/cnn.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tuned/cnn_study.db" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn_study.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/pid.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/pid.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/Архив/cnn.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/Архив/cnn_study.db" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

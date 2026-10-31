@@ -95,10 +95,22 @@ QUIET_BAND = 0.06     # цель учителя |u| <= QUIET_BAND - канал �
 FA_MARGIN = 0.08      # на таких каналах штраф за |u| > FA_MARGIN
 FA_W = 20.0
 
-# Архитектура сети: ручные значения, при наличии tuned/cnn.json - результат tune_cnn.py
+# Какая сеть обучается (кнопка «Обучить» и main.py):
+#   'fast'   - сеть из NIR_optimized: 17 входных каналов, три свёртки 32/64/64, один проход на отсчёт;
+#   'shared' - прежняя сеть Modified: одна свёртка прогоняется по каждому из 8 показателей отдельно
+#              (8 строк на отсчёт, вычислений в разы больше), размеры слоёв и LR/BATCH_SIZE/WEIGHT_DECAY
+#              берутся из tuned/cnn.json.
+# Переключить без правки файла: переменная окружения NIR_ARCH=shared.
+CNN_ARCH = os.environ.get('NIR_ARCH', 'fast').strip().lower()   # читаем переменную окружения, по умолчанию 'fast'
+assert CNN_ARCH in ('fast', 'shared'), "NIR_ARCH должна быть 'fast' или 'shared'"   # защита от опечатки
+
+# Архитектура сети: ручные значения (для 'fast' они совпадают с NIR_optimized), для 'shared' при наличии
+# tuned/cnn.json - результат tune_cnn.py
 MODEL_HP = {'k1': 5, 'k2': 3, 'k3': 3, 'c1': 32, 'c2': 64, 'c3': 64,
             'pool': 8, 'fc': 128, 'dropout': 0.0}
-_cnn = _load('cnn.json')
+# tuned/cnn.json подбирался на GPU под сеть 'shared'; для 'fast' он не применяется, остаются LR = 5e-4,
+# BATCH_SIZE = 128, WEIGHT_DECAY = 0 (как в NIR_optimized)
+_cnn = _load('cnn.json') if CNN_ARCH == 'shared' else {}   # для 'fast' пустой словарь - tuned-значения не подмешиваются
 MODEL_HP.update(_cnn.get('model', {}))
 LR = _cnn.get('train', {}).get('LR', LR)
 BATCH_SIZE = int(_cnn.get('train', {}).get('BATCH_SIZE', BATCH_SIZE))

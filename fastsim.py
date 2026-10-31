@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from config import (A_CUR, CRITICAL_SCENARIOS, G, GAMMA, I_MAX, IQR_TO_SIGMA, KD, KI, KP, N_PARAMS,
+from config import (A_CUR, CRITICAL_SCENARIOS, DELTA, G, GAMMA, I_MAX, IQR_TO_SIGMA, KD, KI, KP, N_PARAMS,
                     N_WINDOW, N_ZONES, PID_WINDOW, SCENARIOS, SEED_CRITICAL_START,
                     SEED_TEACHER_START, SIG_CUR, T_TOTAL, WINDOW)
 from plant import plant
@@ -124,6 +124,7 @@ class BatchPIDPolicy:
     ПИД-учитель для B эпизодов. kp, ki, kd, window, imax - числа (для всех) или массивы (B,)
     (свои значения у каждого эпизода: так считаются сразу все кандидаты CMA-ES).
     Без аргументов - значения из config. Сумма по окну - последние window тактов, как в PIDPolicy.
+    Мёртвая зона: на канале с |e| <= DELTA учитель выдаёт u = 0 (сеть учится не реагировать в допуске).
     """
 
     def __init__(self, kp=None, ki=None, kd=None, window=None, imax=None):
@@ -150,7 +151,7 @@ class BatchPIDPolicy:
         saturated = ((u_raw > 1.0) & (e > 0)) | ((u_raw < -1.0) & (e < 0))
         self.hist[:, -1] = np.where(saturated, 0.0, e)
         self.e_prev = e
-        return u
+        return np.where(np.abs(e) <= DELTA, 0.0, u)      # мёртвая зона
 
 
 class BatchCNNPolicy:

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from config import G, I_MAX, KD, KI, KP, N_PARAMS, N_ZONES, PID_WINDOW, SIG_CUR, T_START, T_TOTAL, WINDOW
+from config import DELTA, G, I_MAX, KD, KI, KP, N_PARAMS, N_ZONES, PID_WINDOW, SIG_CUR, T_START, T_TOTAL, WINDOW
 from plant import plant
 from scenarios import get_disturbance_profile
 
@@ -69,7 +69,7 @@ class PIDPolicy:
             self.buf[-1] = np.where(saturated_high | saturated_low, 0.0, self.buf[-1])
 
         self.e_prev = e
-        return u
+        return np.where(np.abs(e) <= DELTA, 0.0, u)      # мёртвая зона
 
 
 class CNNPolicy:

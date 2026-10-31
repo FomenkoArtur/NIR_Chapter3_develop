@@ -134,7 +134,8 @@ def episode_noise(seed, noise_scale=1.0):
 
 
 class PIDPolicy:
-    """ПИД-учитель (зона = показатель) на устройстве; сумма по окну - последние PID_WINDOW тактов (кольцевой буфер)."""
+    """ПИД-учитель (зона = показатель) на устройстве; сумма по окну - последние PID_WINDOW тактов (кольцевой буфер).
+    Мёртвая зона: при |e| <= DELTA учитель выдаёт u = 0."""
 
     def reset(self, batch, sim):
         self.n_i = int(PID['PID_WINDOW'])
@@ -151,7 +152,7 @@ class PIDPolicy:
         saturated = ((u_raw > 1.0) & (e > 0)) | ((u_raw < -1.0) & (e < 0))
         self.hist[:, p] = torch.where(saturated, torch.zeros_like(e), e)       # антиприращение интеграла
         self.e_prev = e
-        return u
+        return torch.where(e.abs() <= DELTA, torch.zeros_like(u), u)          # мёртвая зона: в допуске u = 0
 
 
 class CNNPolicy:
