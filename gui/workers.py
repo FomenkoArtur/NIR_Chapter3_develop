@@ -1,15 +1,13 @@
-from copy import deepcopy
+import time
 
 import numpy as np
 import torch
-import torch.optim as optim
 from PySide6.QtCore import QThread, Signal
 
 import hw
-from config import BATCH_SIZE, LR, MAX_EPOCHS, PATIENCE, SEED
+from config import SEED
 from experiment import run_full_experiment
-from model import CNNController
-from trainer import generate_training_data, iterate_batches, weighted_mse
+from trainer import build_datasets, get_device, train_model
 
 
 class TrainWorker(QThread):
@@ -17,6 +15,8 @@ class TrainWorker(QThread):
     message = Signal(str)
     succeeded = Signal(object)
     failed = Signal(str)
+
+    SPEED_EVERY = 25          # как часто сообщать скорость обучения, эпох
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -31,63 +31,32 @@ class TrainWorker(QThread):
             np.random.seed(SEED)
             torch.manual_seed(SEED)
 
+            if hw.on_battery():
+                self.message.emit("Ноутбук работает от батареи: процессор ограничивает мощность, "
+                                  "обучение будет заметно медленнее. Подключите зарядку.")
             self.message.emit("Формирование обучающей выборки...")
-            X_train, Y_train, X_val, Y_val = generate_training_data()
-            self.message.emit(
-                f"Объём выборки: обучение {len(X_train)}, проверка {len(X_val)}"
-            )
+            data = build_datasets()
+            self.message.emit(f"Объём выборки: обучение {len(data[0])}, проверка {len(data[2])}")
+            self.message.emit(f"Режим вычислений: {hw.describe()}, устройство: {get_device()}")
 
-            model = CNNController()
-            optimizer = optim.Adam(model.parameters(), lr=LR) if LR else optim.Adam(model.parameters())
-            scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-                optimizer, mode='min', factor=0.5, patience=15
-            )
+            clock = {'t': time.perf_counter()}
 
-            best_loss = float('inf')
-            best_state = None
-            bad_epochs = 0
-
-            for epoch in range(1, MAX_EPOCHS + 1):
-                if self._stop_requested:
-                    self.message.emit("Обучение остановлено пользователем.")
-                    break
-
-                model.train()
-                total = 0.0
-                for xb, yb in iterate_batches(X_train, Y_train, BATCH_SIZE):
-                    optimizer.zero_grad()
-                    loss = weighted_mse(model(xb), yb)
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                    optimizer.step()
-                    total += loss.item() * len(xb)
-                train_loss = total / len(X_train)
-
-                model.eval()
-                with torch.inference_mode():
-                    val_loss = weighted_mse(model(X_val), Y_val).item()
-                scheduler.step(val_loss)
-
+            def on_epoch(epoch, train_loss, val_loss):
                 self.epoch_done.emit(epoch, train_loss, val_loss)
+                if epoch % self.SPEED_EVERY == 0:
+                    now = time.perf_counter()
+                    self.message.emit(f"Скорость: {(now - clock['t']) / self.SPEED_EVERY:.1f} с на эпоху")
+                    clock['t'] = now
 
-                if val_loss < best_loss - 1e-6:
-                    best_loss = val_loss
-                    bad_epochs = 0
-                    best_state = deepcopy(model.state_dict())
-                else:
-                    bad_epochs += 1
-                    if bad_epochs >= PATIENCE:
-                        self.message.emit(
-                            f"Ранний останов на эпохе {epoch}, val MSE = {best_loss:.6f}"
-                        )
-                        break
+            # тот же train_model, что и в main.py: параметры LR, BATCH_SIZE, WEIGHT_DECAY и архитектура
+            # берутся из config (в том числе из tuned/cnn.json)
+            with hw.keep_awake():
+                model = train_model(data=data, verbose=False, on_epoch=on_epoch, log=self.message.emit,
+                                    should_stop=lambda: self._stop_requested)
 
-            if best_state is None:
+            if model is None:
                 self.failed.emit("Обучение прервано до завершения первой эпохи.")
                 return
-
-            model.load_state_dict(best_state)
-            model.eval()
             self.succeeded.emit(model)
         except Exception as exc:
             self.failed.emit(str(exc))

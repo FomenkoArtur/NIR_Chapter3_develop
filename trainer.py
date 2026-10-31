@@ -1,27 +1,33 @@
 """
 Генерация выборок (fastsim) и обучение CNN (данные в памяти устройства, без DataLoader).
+
+train_model - единственная реализация цикла обучения: её вызывают main.py, кнопка «Обучить регулятор»
+(gui/workers.py) и замер bench_train.py. Поэтому режим вычислений, подобранный под компьютер (hw.py),
+действует везде одинаково, а результат обучения не зависит от того, откуда оно запущено.
 """
 
-import numpy as np
-import torch
-import torch.optim as optim
+import time
 from copy import deepcopy
 
+import torch
+import torch.optim as optim
+
+import hw
 from config import (MAX_EPOCHS, PATIENCE, TRAIN_HP, ACTIVE_W, SEED_TEACHER_START, SEED_CRITICAL_START,
-                    CRITICAL_SCENARIOS)
+                    CRITICAL_SCENARIOS, QUIET_BAND, FA_MARGIN, FA_W)
 from fastsim import critical_arrays, train_arrays, training_profiles
 from model import CNNController
 
 
 def get_device():
-    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    return torch.device(hw.pick_device())
 
 
 def weighted_mse(pred, target, active_w=ACTIVE_W):
-    err = (pred - target) ** 2
-    active = (target.abs().max(dim=1, keepdim=True).values > 0.1).float()
-    w = 1.0 + active_w * active
-    return (err * w).mean()
+    quiet = (target.abs() <= QUIET_BAND).float()
+    err = (pred - target) ** 2 * (1.0 + active_w * (1.0 - quiet))
+    false_alarm = (torch.relu(pred.abs() - FA_MARGIN) ** 2 * quiet).mean()
+    return err.mean() + FA_W * false_alarm
 
 
 def iterate_batches(X, Y, batch_size):
@@ -90,10 +96,17 @@ def weights_fingerprint(model):
 
 
 def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=True,
-                max_epochs=None, patience=None):
+                max_epochs=None, patience=None, on_epoch=None, should_stop=None, log=print):
     """
-    Обучение на GPU (если есть). Возвращает модель на CPU - остальной код (CNNPolicy и т.д.)
-    работает без изменений.
+    Обучение (на GPU, если выбран; на этом ноутбуке - на процессоре). Возвращает модель на CPU - остальной код
+    (CNNPolicy и т.д.) работает без изменений.
+
+    callback(epoch, val_loss)               - как раньше (эпохи с нуля), для tune-скриптов и замеров;
+    on_epoch(epoch, train_loss, val_loss)   - после каждой эпохи, номер эпохи с единицы (кривые обучения в GUI);
+    should_stop()                           - опрашивается перед каждым батчем; True - остановить обучение
+                                              (недообученная эпоха отбрасывается, возвращаются лучшие веса);
+    log(text)                               - куда писать сообщения (print или сигнал GUI).
+    Если остановка пришла до конца первой эпохи, возвращается None.
     """
     hp = dict(TRAIN_HP)
     hp.update(train_hp or {})
@@ -116,7 +129,7 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=15)
 
     if verbose:
-        print(f"Обучение CNN на {dev}...")
+        log(f"Обучение CNN на {dev}...")
 
     best_val_loss = float('inf')
     bad_epochs = 0
@@ -124,11 +137,16 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
     first_by_scenario = None
 
     for epoch in range(max_epochs):
+        t_epoch = time.perf_counter()
         model.train()
         perm = torch.randperm(n, device=dev)
         Xp, Yp = Xt[perm], Yt[perm]                   # одна перестановка за эпоху вместо двух выборок на батч
         total = torch.zeros((), device=dev)          # накопление на устройстве, без .item() в цикле
+        interrupted = False
         for i in range(0, n, bs):
+            if should_stop is not None and should_stop():
+                interrupted = True
+                break
             xb, yb = Xp[i:i + bs], Yp[i:i + bs]
             if len(xb) < 2:                           # BatchNorm не работает на батче из 1 элемента
                 continue
@@ -138,6 +156,9 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
             total += loss.detach() * len(xb)
+        if interrupted:
+            log("Обучение остановлено пользователем.")
+            break
         train_loss = total.item() / n                 # единственная синхронизация за эпоху (вместе с val)
 
         model.eval()
@@ -149,10 +170,13 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
             if epoch == 0:
                 first_by_scenario = mse_by_scenario(model, X_val, Y_val, groups)
             if (epoch + 1) % 10 == 0 or epoch == 0:
-                print(f"  эпоха {epoch + 1}: train = {train_loss:.6f}, val = {val_loss:.6f}, lr = {optimizer.param_groups[0]['lr']:.2e}")
+                log(f"  эпоха {epoch + 1}: train = {train_loss:.6f}, val = {val_loss:.6f}, "
+                    f"lr = {optimizer.param_groups[0]['lr']:.2e}, {time.perf_counter() - t_epoch:.1f} с/эпоха")
 
         if callback is not None:
             callback(epoch, val_loss)
+        if on_epoch is not None:
+            on_epoch(epoch + 1, train_loss, val_loss)
 
         if val_loss < best_val_loss - 1e-6:
             best_val_loss = val_loss
@@ -161,20 +185,20 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
         else:
             bad_epochs += 1
             if bad_epochs >= patience:
-                if verbose:
-                    print(f"Ранний останов на эпохе {epoch + 1}")
+                log(f"Ранний останов на эпохе {epoch + 1}, val MSE = {best_val_loss:.6f}")
                 break
 
-    if best_state is not None:
-        model.load_state_dict(best_state)
+    if best_state is None:
+        return None
+    model.load_state_dict(best_state)
 
-    if verbose:
+    if verbose and first_by_scenario is not None:
         final_by_scenario = mse_by_scenario(model, X_val, Y_val, groups)
-        print("\nMSE на критических ситуациях:")
+        log("\nMSE на критических ситуациях:")
         for name in CRITICAL_SCENARIOS:
             first, final = first_by_scenario[name], final_by_scenario[name]
-            print(f"  {name}: {first:.6f} -> {final:.6f} ({final / first - 1:+.0%})")
-        print("Обучение завершено.")
+            log(f"  {name}: {first:.6f} -> {final:.6f} ({final / first - 1:+.0%})")
+        log("Обучение завершено.")
 
     model = model.cpu().eval()
     del Xt, Yt, Xv, Yv

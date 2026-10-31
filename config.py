@@ -91,6 +91,9 @@ VAL_SPLIT = 0.2
 LR = 5e-4
 WEIGHT_DECAY = 0.0
 ACTIVE_W = 5.0
+QUIET_BAND = 0.06     # цель учителя |u| <= QUIET_BAND - канал в норме
+FA_MARGIN = 0.08      # на таких каналах штраф за |u| > FA_MARGIN
+FA_W = 20.0
 
 # Архитектура сети: ручные значения, при наличии tuned/cnn.json - результат tune_cnn.py
 MODEL_HP = {'k1': 5, 'k2': 3, 'k3': 3, 'c1': 32, 'c2': 64, 'c3': 64,
