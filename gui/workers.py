@@ -4,12 +4,12 @@ import numpy as np
 import torch
 import torch.optim as optim
 from PySide6.QtCore import QThread, Signal
-from torch.utils.data import DataLoader, TensorDataset
 
+import hw
 from config import BATCH_SIZE, LR, MAX_EPOCHS, PATIENCE, SEED
 from experiment import run_full_experiment
 from model import CNNController
-from trainer import generate_training_data, weighted_mse
+from trainer import generate_training_data, iterate_batches, weighted_mse
 
 
 class TrainWorker(QThread):
@@ -27,6 +27,7 @@ class TrainWorker(QThread):
 
     def run(self):
         try:
+            hw.configure_torch_threads()
             np.random.seed(SEED)
             torch.manual_seed(SEED)
 
@@ -36,9 +37,6 @@ class TrainWorker(QThread):
                 f"Объём выборки: обучение {len(X_train)}, проверка {len(X_val)}"
             )
 
-            loader = DataLoader(
-                TensorDataset(X_train, Y_train), batch_size=BATCH_SIZE, shuffle=True
-            )
             model = CNNController()
             optimizer = optim.Adam(model.parameters(), lr=LR) if LR else optim.Adam(model.parameters())
             scheduler = optim.lr_scheduler.ReduceLROnPlateau(
@@ -56,7 +54,7 @@ class TrainWorker(QThread):
 
                 model.train()
                 total = 0.0
-                for xb, yb in loader:
+                for xb, yb in iterate_batches(X_train, Y_train, BATCH_SIZE):
                     optimizer.zero_grad()
                     loss = weighted_mse(model(xb), yb)
                     loss.backward()
@@ -66,7 +64,7 @@ class TrainWorker(QThread):
                 train_loss = total / len(X_train)
 
                 model.eval()
-                with torch.no_grad():
+                with torch.inference_mode():
                     val_loss = weighted_mse(model(X_val), Y_val).item()
                 scheduler.step(val_loss)
 
@@ -105,6 +103,7 @@ class ExperimentWorker(QThread):
 
     def run(self):
         try:
+            hw.configure_torch_threads()
             frame, false_alarm = run_full_experiment(self._model)
             self.succeeded.emit(frame, float(false_alarm))
         except Exception as exc:

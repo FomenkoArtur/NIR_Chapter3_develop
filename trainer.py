@@ -1,5 +1,5 @@
 """
-Генерация выборок и обучение CNN (GPU-версия: данные в VRAM, без DataLoader).
+Генерация выборок (fastsim) и обучение CNN (данные в памяти устройства, без DataLoader).
 """
 
 import numpy as np
@@ -7,11 +7,9 @@ import torch
 import torch.optim as optim
 from copy import deepcopy
 
-from config import (WINDOW, T_TOTAL, MAX_EPOCHS, PATIENCE, TRAIN_HP, ACTIVE_W,
-                    SEED_TEACHER_START, SEED_CRITICAL_START, N_PARAMS, SCENARIOS,
+from config import (MAX_EPOCHS, PATIENCE, TRAIN_HP, ACTIVE_W, SEED_TEACHER_START, SEED_CRITICAL_START,
                     CRITICAL_SCENARIOS)
-from episode import PIDPolicy, build_features, run_episode
-from scenarios import critical_profile, custom_profile, get_disturbance_profile
+from fastsim import critical_arrays, train_arrays, training_profiles
 from model import CNNController
 
 
@@ -26,78 +24,23 @@ def weighted_mse(pred, target, active_w=ACTIVE_W):
     return (err * w).mean()
 
 
-def training_profiles():
-    trend = SCENARIOS['S1']['rate_value']
-    jump = abs(SCENARIOS['S2']['jump_value'])
-
-    profiles = [('S4', None)] * 4
-    for param in range(N_PARAMS):
-        for kind, value in (('trend', trend), ('trend', -trend),
-                            ('jump', jump), ('jump', -jump)):
-            profiles.append((kind, (param, kind, value)))
-
-    for p1, p2 in [(0, 4), (1, 5), (2, 7), (3, 6)]:
-        for sign in (1, -1):
-            profiles.append(('jump2', ((p1, p2), 'jump2', sign * jump * 0.8)))
-    return profiles
-
-
-def window_pairs(episode):
-    Xs, Ys = [], []
-    for t in range(0, T_TOTAL):                           # раньше было range(WINDOW - 1, T_TOTAL)
-        idx = np.maximum(np.arange(t - WINDOW + 1, t + 1), 0)
-        Xs.append(build_features(episode.eps[idx], episode.N[idx]))
-        Ys.append(episode.u[t])
-    return Xs, Ys
+def iterate_batches(X, Y, batch_size):
+    order = torch.randperm(len(X))
+    for start in range(0, len(X), batch_size):
+        idx = order[start:start + batch_size]
+        yield X[idx], Y[idx]
 
 
 def generate_train_set():
     print("Формирование обучающей выборки...")
-    Xs, Ys = [], []
-
-    for ep, (name, spec) in enumerate(training_profiles(), start=1):
-        t0 = np.random.randint(WINDOW + 5, WINDOW + 20)
-        scale = np.random.uniform(0.7, 1.3)
-
-        if spec is None:
-            profile = get_disturbance_profile('S4', t0, scale)
-        else:
-            param, kind, value = spec
-            if kind == 'jump2':
-                p1, p2 = param
-                rate1, jump1 = custom_profile(p1, 'jump', value * scale, t0)
-                rate2, jump2 = custom_profile(p2, 'jump', value * scale, t0)
-                profile = (rate1 + rate2, jump1 + jump2)
-            else:
-                profile = custom_profile(param, kind, value * scale, t0)
-
-        episode = run_episode(name, PIDPolicy(), seed=SEED_TEACHER_START + ep,
-                              t0=t0, profile=profile)
-        x, y = window_pairs(episode)
-        Xs += x
-        Ys += y
-
-    X = torch.tensor(np.array(Xs), dtype=torch.float32)
-    Y = torch.tensor(np.array(Ys), dtype=torch.float32)
-    return X, Y
+    X, Y = train_arrays()
+    return torch.tensor(X, dtype=torch.float32), torch.tensor(Y, dtype=torch.float32)
 
 
 def generate_critical_set():
     print("Формирование тестовой выборки...")
-    Xs, Ys, groups = [], [], []
-
-    for ep, (name, spec) in enumerate(CRITICAL_SCENARIOS.items(), start=1):
-        episode = run_episode(name, PIDPolicy(), seed=SEED_CRITICAL_START + ep, t0=spec['t0'],
-                              profile=critical_profile(name),
-                              noise_scale=spec.get('noise_scale', 1.0))
-        x, y = window_pairs(episode)
-        Xs += x
-        Ys += y
-        groups += [name] * len(x)
-
-    X = torch.tensor(np.array(Xs), dtype=torch.float32)
-    Y = torch.tensor(np.array(Ys), dtype=torch.float32)
-    return X, Y, np.array(groups)
+    X, Y, groups = critical_arrays()
+    return torch.tensor(X, dtype=torch.float32), torch.tensor(Y, dtype=torch.float32), groups
 
 
 def check_sets(X_train, Y_train, X_test, Y_test):
@@ -137,7 +80,7 @@ def generate_training_data():
 def mse_by_scenario(model, X_test, Y_test, groups):
     model.eval()
     dev = next(model.parameters()).device
-    with torch.no_grad():
+    with torch.inference_mode():
         err = ((model(X_test.to(dev)) - Y_test.to(dev)) ** 2).mean(dim=1).cpu().numpy()
     return {name: float(err[groups == name].mean()) for name in CRITICAL_SCENARIOS}
 
@@ -183,22 +126,22 @@ def train_model(model_hp=None, train_hp=None, data=None, callback=None, verbose=
     for epoch in range(max_epochs):
         model.train()
         perm = torch.randperm(n, device=dev)
-        total = torch.zeros((), device=dev)          # накопление на GPU, без .item() в цикле
+        Xp, Yp = Xt[perm], Yt[perm]                   # одна перестановка за эпоху вместо двух выборок на батч
+        total = torch.zeros((), device=dev)          # накопление на устройстве, без .item() в цикле
         for i in range(0, n, bs):
-            idx = perm[i:i + bs]
-            if len(idx) < 2:                          # BatchNorm не работает на батче из 1 элемента
+            xb, yb = Xp[i:i + bs], Yp[i:i + bs]
+            if len(xb) < 2:                           # BatchNorm не работает на батче из 1 элемента
                 continue
-            xb, yb = Xt[idx], Yt[idx]
             optimizer.zero_grad(set_to_none=True)
             loss = weighted_mse(model(xb), yb)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
-            total += loss.detach() * len(idx)
+            total += loss.detach() * len(xb)
         train_loss = total.item() / n                 # единственная синхронизация за эпоху (вместе с val)
 
         model.eval()
-        with torch.no_grad():
+        with torch.inference_mode():
             val_loss = weighted_mse(model(Xv), Yv).item()
         scheduler.step(val_loss)
 

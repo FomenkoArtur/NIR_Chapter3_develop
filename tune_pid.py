@@ -1,6 +1,7 @@
 """
 Автонастройка ПИД-учителя: CMA-ES по цифровому двойнику.
 Запуск: python tune_pid.py   ->  tuned/pid.json
+Кандидаты каждого поколения CMA-ES считаются одним векторным пакетом (fastsim.py).
 """
 
 import json
@@ -9,9 +10,9 @@ import os
 import numpy as np
 
 import config as C
-from episode import PIDPolicy, run_episode
+from fastsim import BatchPIDPolicy, episode_noise, run_episodes_batch
 from metrics import compute_metrics
-from scenarios import custom_profile
+from scenarios import custom_profile, get_disturbance_profile
 
 SEED_PID_TUNE = 120000          # зёрна, не пересекающиеся с обучением/тестом/экспериментом
 MANUAL = (1.6, 0.05, 0.20, 10)  # ручные значения (Kp, Ki, Kd, LI) - для сравнения
@@ -36,20 +37,35 @@ def build_cases(seed0=SEED_PID_TUNE):
     return cases, quiet
 
 
-def evaluate(make_policy, cases, quiet):
-    """Общая функция качества для ПИД и CNN (меньше - лучше)."""
-    iae, ts, tv, fa = [], [], [], []
-    for profile, seed in cases:
-        ep = run_episode('tune', make_policy(), seed=seed, profile=profile)
-        t, a, _ = compute_metrics(ep.eps, ep.u, C.T_START)
-        u = ep.u[C.T_START:C.T_START + C.T_OBS]
-        iae.append(a)
-        ts.append(t)
-        tv.append(np.abs(np.diff(u, axis=0)).sum(axis=1).mean())
-    for seed in quiet:
-        ep = run_episode('S4', make_policy(), seed=seed)
-        fa.append(compute_metrics(ep.eps, ep.u, C.T_START)[2])
-    return float(np.mean(iae) + W_TS * np.mean(ts) / C.T_OBS + W_TV * np.mean(tv) + W_FA * np.mean(fa))
+def evaluate(xs, cases, quiet):
+    """
+    Функция качества (меньше - лучше) сразу для всех кандидатов xs: один пакет
+    "кандидаты x (16 случаев + 3 эпизода S4)". Шум каждого эпизода зависит только от зерна.
+    """
+    n_c, n_e = len(xs), len(cases) + len(quiet)
+    profiles = [p for p, _ in cases] + [get_disturbance_profile('S4', C.T_START, 1.0)] * len(quiet)
+    noise = np.stack([episode_noise(s) for s in [s for _, s in cases] + list(quiet)])
+    params = [decode(x) for x in xs]
+    kp, ki, kd, li = (np.repeat([p[i] for p in params], n_e) for i in range(4))
+
+    batch = run_episodes_batch(profiles * n_c, BatchPIDPolicy(kp, ki, kd, li),
+                               np.tile(noise, (n_c, 1, 1)), [C.T_START] * (n_c * n_e))
+    costs = []
+    for c in range(n_c):
+        iae, ts, tv, fa = [], [], [], []
+        for e in range(n_e):
+            b = c * n_e + e
+            t, a, idle = compute_metrics(batch.eps[b], batch.u[b], C.T_START)
+            if e < len(cases):
+                u = batch.u[b, C.T_START:C.T_START + C.T_OBS]
+                iae.append(a)
+                ts.append(t)
+                tv.append(np.abs(np.diff(u, axis=0)).sum(axis=1).mean())
+            else:
+                fa.append(idle)
+        costs.append(float(np.mean(iae) + W_TS * np.mean(ts) / C.T_OBS + W_TV * np.mean(tv)
+                           + W_FA * np.mean(fa)))
+    return costs
 
 
 def decode(u):
@@ -62,10 +78,10 @@ def encode(kp, ki, kd, li):
 
 
 def main():
-    import cma  # импорт здесь, чтобы tune_cnn.py не требовал cma
+    import cma
 
     cases, quiet = build_cases()
-    cost = lambda x: evaluate(lambda: PIDPolicy(*decode(x)), cases, quiet)
+    cost = lambda x: evaluate([x], cases, quiet)[0]
 
     x0 = encode(*MANUAL)
     base = cost(x0)
@@ -75,7 +91,7 @@ def main():
                                              'seed': C.SEED, 'verbose': -9})
     while not es.stop():
         xs = es.ask()
-        fs = [cost(x) for x in xs]
+        fs = evaluate(xs, cases, quiet)
         es.tell(xs, fs)
         print(f"  поколение {es.countiter}: лучший cost = {min(fs):.4f}")
 
