@@ -4,12 +4,12 @@ import numpy as np
 import torch
 import torch.optim as optim
 from PySide6.QtCore import QThread, Signal
-from torch.utils.data import DataLoader, TensorDataset
 
+import hw
 from config import BATCH_SIZE, LR, MAX_EPOCHS, PATIENCE, SEED
 from experiment import run_full_experiment
 from model import CNNController
-from trainer import generate_training_data, weighted_mse
+from trainer import generate_training_data, iterate_batches, weighted_mse
 
 
 class TrainWorker(QThread):
@@ -27,19 +27,19 @@ class TrainWorker(QThread):
 
     def run(self):
         try:
+            hw.configure_torch_threads()
+            dev = hw.device()
             np.random.seed(SEED)
             torch.manual_seed(SEED)
 
             self.message.emit("Формирование обучающей выборки...")
             X_train, Y_train, X_val, Y_val = generate_training_data()
             self.message.emit(
-                f"Объём выборки: обучение {len(X_train)}, проверка {len(X_val)}"
+                f"Объём выборки: обучение {len(X_train)}, проверка {len(X_val)}; устройство: {dev}"
             )
+            X_train, Y_train, X_val, Y_val = (t.to(dev) for t in (X_train, Y_train, X_val, Y_val))
 
-            loader = DataLoader(
-                TensorDataset(X_train, Y_train), batch_size=BATCH_SIZE, shuffle=True
-            )
-            model = CNNController()
+            model = CNNController().to(dev)
             optimizer = optim.Adam(model.parameters(), lr=LR) if LR else optim.Adam(model.parameters())
             scheduler = optim.lr_scheduler.ReduceLROnPlateau(
                 optimizer, mode='min', factor=0.5, patience=15
@@ -55,18 +55,18 @@ class TrainWorker(QThread):
                     break
 
                 model.train()
-                total = 0.0
-                for xb, yb in loader:
+                total = torch.zeros((), device=dev)
+                for xb, yb in iterate_batches(X_train, Y_train, BATCH_SIZE):
                     optimizer.zero_grad()
                     loss = weighted_mse(model(xb), yb)
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.step()
-                    total += loss.item() * len(xb)
-                train_loss = total / len(X_train)
+                    total += loss.detach() * len(xb)
+                train_loss = total.item() / len(X_train)
 
                 model.eval()
-                with torch.no_grad():
+                with torch.inference_mode():
                     val_loss = weighted_mse(model(X_val), Y_val).item()
                 scheduler.step(val_loss)
 
@@ -89,8 +89,7 @@ class TrainWorker(QThread):
                 return
 
             model.load_state_dict(best_state)
-            model.eval()
-            self.succeeded.emit(model)
+            self.succeeded.emit(model.cpu().eval())
         except Exception as exc:
             self.failed.emit(str(exc))
 
@@ -105,6 +104,7 @@ class ExperimentWorker(QThread):
 
     def run(self):
         try:
+            hw.configure_torch_threads()
             frame, false_alarm = run_full_experiment(self._model)
             self.succeeded.emit(frame, float(false_alarm))
         except Exception as exc:

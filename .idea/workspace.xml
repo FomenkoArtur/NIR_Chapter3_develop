@@ -4,14 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice" />
+    <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice">
+      <change afterPath="$PROJECT_DIR$/fastsim.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hw.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller_weights.pt" beforeDir="false" afterPath="$PROJECT_DIR$/controller_weights.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui/workers.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/workers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/tune_cnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_pid.py" beforeDir="false" afterPath="$PROJECT_DIR$/tune_pid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/cnn.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/cnn_study.db" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn_study.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/pid.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/pid.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="31" />
+    <option name="cachedIndexableFilesCount" value="41" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -51,7 +66,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/FomenkoArtur/HIR_Chapter3.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/FomenkoArtur/NIR_Chapter3_develop&quot;,
     &quot;accountId&quot;: &quot;604d39b8-3d0d-4611-9e88-24fd3b0f036b&quot;
   }
 }</component>
@@ -61,61 +76,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.3786057736287378" />
-      <entry key="MS500" value="2.373794831698895" />
-      <entry key="S2" value="2.816708441974926" />
-      <entry key="S5" value="2.92421811393544" />
-      <entry key="S10" value="2.961684576925487" />
-      <entry key="S30" value="2.987133989809598" />
-      <entry key="S60" value="2.9992381300978956" />
-      <entry key="M2" value="3.3715545413486083" />
-      <entry key="M5" value="8.00267985478606" />
-      <entry key="M10" value="16.798888032513318" />
-      <entry key="M15" value="23.852852395169048" />
-      <entry key="M30" value="36.654324252087775" />
-      <entry key="H1" value="47.06381410371542" />
-      <entry key="H2" value="53.841180504925035" />
-      <entry key="H4" value="57.72897385203404" />
-      <entry key="D1" value="61.259755515565885" />
-      <entry key="W1" value="61.89353034416931" />
+      <entry key="MS100" value="5.908925309116525E-13" />
+      <entry key="MS500" value="0.006948149641827416" />
+      <entry key="S2" value="1.3574404274779894" />
+      <entry key="S5" value="5.254959155866803" />
+      <entry key="S10" value="8.72235427695029" />
+      <entry key="S30" value="12.481197853375969" />
+      <entry key="S60" value="13.870395062525184" />
+      <entry key="M2" value="15.192534272725268" />
+      <entry key="M5" value="19.390018123224777" />
+      <entry key="M10" value="27.690076945444844" />
+      <entry key="M15" value="34.83629481026021" />
+      <entry key="M30" value="48.457828165368454" />
+      <entry key="H1" value="59.972871832758614" />
+      <entry key="H2" value="67.63355246575256" />
+      <entry key="H4" value="72.07837953634994" />
+      <entry key="D1" value="76.14421636483254" />
+      <entry key="W1" value="76.87684215645717" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="1.1285340618565535E-105" />
-      <entry key="S5" value="1.0495566113157477E-42" />
-      <entry key="S10" value="1.0244787022265265E-21" />
-      <entry key="S30" value="1.008093879773303E-7" />
-      <entry key="S60" value="3.1750494909168917E-4" />
-      <entry key="M2" value="0.01782139480299245" />
-      <entry key="M5" value="0.20563333889694793" />
-      <entry key="M10" value="0.5239752684745391" />
-      <entry key="M15" value="0.7656657479993446" />
-      <entry key="M30" value="1.1901625012477197" />
-      <entry key="H1" value="1.526780203975647" />
-      <entry key="H2" value="1.7427965730267918" />
-      <entry key="H4" value="1.8657259522378193" />
-      <entry key="D1" value="1.976784102764212" />
-      <entry key="W1" value="1.9966622746449951" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.000000000459399" />
+      <entry key="S60" value="1.0000214335948785" />
+      <entry key="M2" value="1.004630351394778" />
+      <entry key="M5" value="1.1199395543912969" />
+      <entry key="M10" value="1.4001706573804928" />
+      <entry key="M15" value="1.6397282372112483" />
+      <entry key="M30" value="2.087888568773585" />
+      <entry key="H1" value="2.4597066804932317" />
+      <entry key="H2" value="2.704084926612352" />
+      <entry key="H4" value="2.844888490294081" />
+      <entry key="D1" value="2.973087224708812" />
+      <entry key="W1" value="2.996128410437354" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.3083322255940493" />
-      <entry key="MS500" value="2.2851043449217947" />
-      <entry key="S2" value="2.7828088936142534" />
-      <entry key="S5" value="2.9094339197290457" />
-      <entry key="S10" value="2.9540756155471066" />
-      <entry key="S30" value="2.9845482985100533" />
-      <entry key="S60" value="2.9981825024725572" />
-      <entry key="M2" value="3.386317843380827" />
-      <entry key="M5" value="8.196117406494265" />
-      <entry key="M10" value="17.30857275503992" />
-      <entry key="M15" value="24.605621315055398" />
-      <entry key="M30" value="37.83553861357721" />
-      <entry key="H1" value="48.58523409023425" />
-      <entry key="H2" value="55.58102441176623" />
-      <entry key="H4" value="59.593147075124214" />
-      <entry key="D1" value="63.23626940280052" />
-      <entry key="W1" value="63.89015372518583" />
+      <entry key="MS100" value="1.085313451141386E-9" />
+      <entry key="MS500" value="0.023007687818934166" />
+      <entry key="S2" value="1.7094076257561654" />
+      <entry key="S5" value="5.908250064860799" />
+      <entry key="S10" value="9.528212066697778" />
+      <entry key="S30" value="13.41085765607516" />
+      <entry key="S60" value="14.834375484371234" />
+      <entry key="M2" value="16.178192678553202" />
+      <entry key="M5" value="20.495523546067407" />
+      <entry key="M10" value="29.075664891409662" />
+      <entry key="M15" value="36.46279981693772" />
+      <entry key="M30" value="50.536312754183726" />
+      <entry key="H1" value="62.426841154088535" />
+      <entry key="H2" value="70.33444394167347" />
+      <entry key="H4" value="74.92157943947734" />
+      <entry key="D1" value="79.11700834402708" />
+      <entry key="W1" value="79.87292803571155" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -151,9 +166,9 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;NIR-Chapter3&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/AF/PycharmProjects/NIR_Chapter3_develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/AF/PycharmProjects/Продолжение НИР/NIR_Chapter3_develop&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,

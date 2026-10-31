@@ -3,6 +3,10 @@
 Апробация контура автоматического управления (Глава 3).
 """
 
+import hw
+
+hardware = hw.prepare()
+
 import numpy as np
 import torch
 
@@ -18,6 +22,9 @@ def main():
     print("АПРОБАЦИЯ КОНТУРА АВТОМАТИЧЕСКОГО УПРАВЛЕНИЯ")
     print("=" * 70)
 
+    print(hw.describe(hardware))
+    threads = hw.configure_torch_threads()
+    print(f"Потоков PyTorch: {threads}, устройство обучения: {hw.device()}")
     np.random.seed(SEED)
     torch.manual_seed(SEED)
 
