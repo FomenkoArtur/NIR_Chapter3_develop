@@ -5,16 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice">
+      <change afterPath="$PROJECT_DIR$/pid_tune.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller_weights.pt" beforeDir="false" afterPath="$PROJECT_DIR$/controller_weights.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/episode.py" beforeDir="false" afterPath="$PROJECT_DIR$/episode.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fastsim.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastsim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/tune_cnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/2026 10 31 23 30/cnn.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuned/2026 10 31 23 30/cnn_study_shared.db" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tuned/cnn.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tuned/cnn_study.db" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn_study.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tuned/pid.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/pid.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/Архив/cnn.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/Архив/cnn_study.db" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +21,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="34" />
+    <option name="cachedIndexableFilesCount" value="39" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -149,6 +148,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.bench_train.executor": "Run",
     "Python.config.executor": "Run",
     "Python.diagnose.executor": "Run",
     "Python.diagnose2.executor": "Run",
@@ -156,6 +156,7 @@
     "Python.main.executor": "Run",
     "Python.main_window.executor": "Run",
     "Python.model.executor": "Run",
+    "Python.pid_tune.executor": "Run",
     "Python.plots.executor": "Run",
     "Python.run_gui.executor": "Run",
     "Python.show_model.executor": "Run",

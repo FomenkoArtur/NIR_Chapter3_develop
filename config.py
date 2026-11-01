@@ -10,12 +10,13 @@ import numpy as np
 _TUNED_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tuned')
 
 
-def _load(name):
-    """Результат автонастройки (tuned/<name>) или {}, если настройка не запускалась."""
+def _load(name, required=False):
     path = os.path.join(_TUNED_DIR, name)
     if os.path.exists(path):
         with open(path, encoding='utf-8') as f:
             return json.load(f)
+    if required:
+        raise FileNotFoundError(f"Нет {path}: для NIR_ARCH=shared положите нужный cnn.json прямо в tuned/")
     return {}
 
 
@@ -86,7 +87,7 @@ PID_WINDOW = int(_pid.get('PID_WINDOW', PID_WINDOW))
 # ========== ПАРАМЕТРЫ ОБУЧЕНИЯ ==========
 BATCH_SIZE = 128
 MAX_EPOCHS = 800
-PATIENCE = 60
+PATIENCE = 20
 VAL_SPLIT = 0.2
 LR = 5e-4
 WEIGHT_DECAY = 0.0
@@ -101,7 +102,7 @@ FA_W = 20.0
 #              (8 строк на отсчёт, вычислений в разы больше), размеры слоёв и LR/BATCH_SIZE/WEIGHT_DECAY
 #              берутся из tuned/cnn.json.
 # Переключить без правки файла: переменная окружения NIR_ARCH=shared.
-CNN_ARCH = os.environ.get('NIR_ARCH', 'fast').strip().lower()   # читаем переменную окружения, по умолчанию 'fast'
+CNN_ARCH = os.environ.get('NIR_ARCH', 'shared').strip().lower()  # читаем переменную окружения, по умолчанию 'fast'
 assert CNN_ARCH in ('fast', 'shared'), "NIR_ARCH должна быть 'fast' или 'shared'"   # защита от опечатки
 
 # Архитектура сети: ручные значения (для 'fast' они совпадают с NIR_optimized), для 'shared' при наличии
@@ -110,7 +111,7 @@ MODEL_HP = {'k1': 5, 'k2': 3, 'k3': 3, 'c1': 32, 'c2': 64, 'c3': 64,
             'pool': 8, 'fc': 128, 'dropout': 0.0}
 # tuned/cnn.json подбирался на GPU под сеть 'shared'; для 'fast' он не применяется, остаются LR = 5e-4,
 # BATCH_SIZE = 128, WEIGHT_DECAY = 0 (как в NIR_optimized)
-_cnn = _load('cnn.json') if CNN_ARCH == 'shared' else {}   # для 'fast' пустой словарь - tuned-значения не подмешиваются
+_cnn = _load('cnn.json', required=True) if CNN_ARCH == 'shared' else {}   # для 'fast' пустой словарь - tuned-значения не подмешиваются
 MODEL_HP.update(_cnn.get('model', {}))
 LR = _cnn.get('train', {}).get('LR', LR)
 BATCH_SIZE = int(_cnn.get('train', {}).get('BATCH_SIZE', BATCH_SIZE))
