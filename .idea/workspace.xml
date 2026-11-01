@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3531002b-cd61-43ec-bd3f-d7fd70996ad7" name="Changes" comment="Voice">
-      <change afterPath="$PROJECT_DIR$/pid_tune.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller_weights.pt" beforeDir="false" afterPath="$PROJECT_DIR$/controller_weights.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/2026 10 31 23 30/cnn.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/2026 10 31 23 30/cnn_study_shared.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/cnn.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/cnn_study.db" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/cnn_study.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuned/pid.json" beforeDir="false" afterPath="$PROJECT_DIR$/tuned/pid.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/episode.py" beforeDir="false" afterPath="$PROJECT_DIR$/episode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fastsim.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastsim.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pid_tune.py" beforeDir="false" afterPath="$PROJECT_DIR$/pid_tune.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -268,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1792672308869</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Voice">
+      <option name="closed" value="true" />
+      <created>1793530518470</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1793530518470</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

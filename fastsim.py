@@ -14,7 +14,9 @@ from config import (A_CUR, CRITICAL_SCENARIOS, DELTA, G, GAMMA, I_MAX, IQR_TO_SI
                     SEED_TEACHER_START, SIG_CUR, T_TOTAL, WINDOW)
 from plant import plant
 from scenarios import critical_profile, custom_profile, get_disturbance_profile
-
+from config import (A_CUR, CRITICAL_SCENARIOS, DELTA, G, GAMMA, I_MAX, I_SEP, IQR_TO_SIGMA, KD, KI, KP, N_PARAMS,
+                    N_WINDOW, N_ZONES, PID_INTEGRATOR, PID_WINDOW, SCENARIOS, SEED_CRITICAL_START,
+                    SEED_TEACHER_START, SIG_CUR, T_TOTAL, WINDOW)
 
 class BatchNormalizer:
     """Нормализация (10)-(12) сразу для B независимых эпизодов, окно (B, окно, 8)."""
@@ -140,9 +142,20 @@ class BatchPIDPolicy:
         self.keep = (np.arange(wmax)[None, :] >= wmax - n_i[:, None])[:, :, None]
         self.hist = np.zeros((batch, wmax, N_ZONES))
         self.e_prev = np.zeros((batch, N_ZONES))
+        self.I = np.zeros((batch, N_ZONES))             # состояние настоящего интегратора (режим 'true')
 
     def act(self, eps, x_norm):
         e = x_norm @ plant.V.T - G
+        if PID_INTEGRATOR == 'true':
+            # настоящий интегратор; мёртвая зона только на P и D, иначе при тренде u дребезжит на её границе
+            p = np.where(np.abs(e) <= DELTA, 0.0, self.kp * e + self.kd * (e - self.e_prev))
+            u_raw = p + self.I                          # интегральная часть добавляется всегда
+            u = np.clip(u_raw, -1.0, 1.0)               # выход ограничен диапазоном привода
+            saturated = ((u_raw > 1.0) & (e > 0)) | ((u_raw < -1.0) & (e < 0))   # привод упёрся и ошибка того же знака
+            freeze = saturated | (np.abs(e) > I_SEP)    # антивиндап и разделение интеграла: на большой ошибке не копим
+            self.I = np.clip(self.I + np.where(freeze, 0.0, self.ki * e), -self.imax, self.imax)
+            self.e_prev = e                             # запоминаем ошибку для D-части на следующем такте
+            return u
         self.hist[:, :-1] = self.hist[:, 1:]
         self.hist[:, -1] = e
         i_term = np.clip(self.ki * np.where(self.keep, self.hist, 0.0).sum(axis=1), -self.imax, self.imax)

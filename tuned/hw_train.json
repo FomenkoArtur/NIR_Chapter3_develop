@@ -1,0 +1,6 @@
+{
+  "threads": 8,
+  "pin": "",
+  "device": "cpu",
+  "est_epoch_sec": 8.1
+}

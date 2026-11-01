@@ -7,7 +7,8 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from config import DELTA, G, I_MAX, KD, KI, KP, N_PARAMS, N_ZONES, PID_WINDOW, SIG_CUR, T_START, T_TOTAL, WINDOW
+from config import (DELTA, G, I_MAX, I_SEP, KD, KI, KP, N_PARAMS, N_ZONES, PID_INTEGRATOR, PID_WINDOW, SIG_CUR,
+                    T_START, T_TOTAL, WINDOW)
 from plant import plant
 from scenarios import get_disturbance_profile
 
@@ -52,9 +53,20 @@ class PIDPolicy:
     def reset(self):
         self.e_prev = np.zeros(N_ZONES)
         self.buf = []
+        self.I = np.zeros(N_ZONES)
 
     def act(self, eps, x_norm):
         e = plant.zone_criteria(x_norm) - G
+        if PID_INTEGRATOR == 'true':
+            # то же, что BatchPIDPolicy: мёртвая зона только на P и D, интегральная часть добавляется всегда
+            p = np.where(np.abs(e) <= DELTA, 0.0, self.kp * e + self.kd * (e - self.e_prev))
+            u_raw = p + self.I
+            u = np.clip(u_raw, -1.0, 1.0)
+            saturated = ((u_raw > 1.0) & (e > 0)) | ((u_raw < -1.0) & (e < 0))
+            freeze = saturated | (np.abs(e) > I_SEP)  # антивиндап и разделение интеграла
+            self.I = np.clip(self.I + np.where(freeze, 0.0, self.ki * e), -self.imax, self.imax)
+            self.e_prev = e
+            return u
         self.buf.append(e)
         if len(self.buf) > self.n_i:
             self.buf.pop(0)
